@@ -82,13 +82,19 @@ class CustViewer(idaapi.simplecustviewer_t, Colorizer):
             return
         self.jumpto_in_view(widget, ea)
 
-    def find_disass_view(self):
-        widget = idaapi.find_widget('IDA View-%s' % dbg.registers.pc)
+     def find_disass_view(self):
+        ip_name: str = dbg.registers.pc
+        # if on x64 arch, the ip register is called RIP, but the view is NOT called IDA View-RIP, but IDA View-EIP
+        # thus need to change RIP to EIP, for this purpose
+        if ip_name == "RIP":
+            ip_name = "EIP"
+
+        widget = idaapi.find_widget("IDA View-%s" % ip_name)
         if widget:
             return widget
 
         for c in map(chr, range(65, 75)):
-            widget = idaapi.find_widget('IDA View-%s' % c)
+            widget = idaapi.find_widget("IDA View-%s" % c)
             if widget:
                 return widget
         return None
